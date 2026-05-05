@@ -2,11 +2,11 @@
 
 Upstream base for personal AI-agent deploys on a Linux VPS.
 
-**Status:** Design locked on 2026-05-04; v1 scaffolding underway. The architectural decisions are settled, but the install scripts, systemd templates, and operator docs referenced below have not yet landed in the repo. This README documents the shape of the system, not its current contents.
+**Status:** Design locked; v1 scaffolding underway. The architectural decisions are settled, but the install scripts, systemd templates, and operator docs referenced below have not yet landed in the repo. This README documents the shape of the system, not its current contents.
 
 ## What this is
 
-This repo is the upstream base. It exists to be forked. Each downstream fork — `marketing-agent` for a CMO running HubSpot, `cpa-agent` for a sole practitioner on QuickBooks, and so on — inherits the same skeleton: install script, hardening orchestration, workspace seeds, reference skill, systemd templates. The fork then adds its domain: HubSpot integration and Southworth-specific workspace files in marketing-agent's case; QuickBooks and tax-season heuristics in cpa-agent's. The base stays generic. The fork carries the integration. Drift between forks is intentional, not accidental.
+This repo is the upstream base. It exists to be forked. Each downstream fork — `marketing-agent` for a CMO running HubSpot, `cpa-agent` for a sole practitioner on QuickBooks, and so on — inherits the same skeleton: install script, hardening orchestration, workspace seeds, reference skill, systemd templates. The fork then adds its domain: HubSpot integration and brand-specific workspace files in marketing-agent's case; QuickBooks and tax-season heuristics in cpa-agent's. The base stays generic. The fork carries the integration. Drift between forks is intentional, not accidental.
 
 ## Lineage
 
@@ -14,7 +14,7 @@ The pattern, the discipline, and most of the install ergonomics come from RShuke
 
 ## Design shape
 
-v1 targets Ubuntu 24.04 LTS on a Hetzner-class VPS, deliberately avoiding provider lock-in and Mac-specific paths. systemd handles services, not launchd; Hermes Agent handles the agent loop, memory, and built-in tooling, so this base does not reinvent any of it. Authentication is Codex OAuth on a single tier — both interactive turns and background pulses run through the same credential, with a Haiku-for-background tier deferred until pulse volume justifies the split. The audience is single-operator and Telegram-only: drafting, thinking, and voice-memo capture, with no customer-facing surface in v1. Data access is Tier 2 read-only — scoped private-app tokens for the SaaS systems each fork talks to, email is drafts-only by policy, and credentials live in Hermes's `.env` rather than a parallel auth-profile layer that would create dual state.
+v1 targets Ubuntu 24.04 LTS on a Hetzner-class VPS, deliberately avoiding provider lock-in and Mac-specific paths. systemd handles services, not launchd; Hermes Agent handles the agent loop, memory, and built-in tooling, so this base does not reinvent any of it. Authentication is Codex OAuth on a single tier — both interactive turns and background pulses run through the same credential, with a Haiku-for-background tier deferred until pulse volume justifies the split. The audience is single-operator and Telegram-only: drafting, thinking, and voice-memo capture, with no customer-facing surface in v1. Data access is read-only by design — scoped private-app tokens for the SaaS systems each fork talks to, no write scopes requested, email is drafts-only by policy, and credentials live in Hermes's `.env` rather than a parallel auth-profile layer that would create dual state.
 
 ## Scope and non-goals
 
