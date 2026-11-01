@@ -202,7 +202,11 @@ Layers, from strongest to weakest:
    secrets never printed, no escalation.
 
 Email drafts-only is a policy in v1: the kit ships no email integration. A fork
-that adds one should enforce it at the credential (drafts scope only) as well.
+that adds one should also enforce it at the credential where the provider
+allows it. Microsoft Graph does: creating a draft needs `Mail.ReadWrite`, and
+sending needs `Mail.Send`. Gmail does not: its compose scope covers drafts and
+sending together. On Gmail, put an adapter in front that holds the real
+credential as a different user and exposes only create-draft.
 
 ## Hardening
 
