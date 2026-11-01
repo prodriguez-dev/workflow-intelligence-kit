@@ -2,7 +2,7 @@
 
 Reusable foundation for deploying client-specific AI assistants and workflow automation for service businesses.
 
-**Status:** Design locked; v1 scaffolding underway. The architectural decisions are settled, but the install scripts, systemd templates, and operator docs referenced below have not yet landed in the repo. This README documents the shape of the system, not its current contents.
+**Status:** v1 scaffolding landed: `install.sh`, the hardening scripts, workspace seeds, operator docs, the weather reference skill, and the gateway systemd drop-in are in the repo, shellcheck-clean, with `--dry-run` on the installer and every hardening script. Not yet proven on a production VPS. The operator steps that need a human (Codex sign-in, Telegram bot, starting the gateway) are in `workspace-docs/BOOTSTRAP.md`.
 
 ## What this is
 
@@ -55,7 +55,16 @@ Explicitly out:
 
 ## What lives where
 
-Implementation will land in `install.sh`, `deploy/hardening/`, `deploy/skills/workflow-intelligence-reference/weather/`, `deploy/systemd/`, `workspace/`, and `workspace-docs/`. Deeper rationale and deviations from the reference architecture will live in `docs/ARCHITECTURE.md`; per-host setup walks through `BOOTSTRAP.md`. None of these paths exist in the repo yet; they appear as the build executes.
+- `install.sh`: idempotent installer; run `sudo ./install.sh --dry-run` first
+- `deploy/hardening/`: `harden.sh` and the four scripts it runs, each usable on its own
+- `deploy/systemd/`: the one template, a drop-in for the unit `hermes gateway install` generates
+- `deploy/skills/workflow-intelligence-reference/weather/`: reference skill
+- `deploy/lib/`: helpers shared by the scripts above
+- `workspace/`: `SOUL.md` and `AGENTS.md`, deployed to `~/.hermes/`
+- `workspace-docs/`: `BOOTSTRAP.md`, `HEARTBEAT.md`, `USER.md`, never deployed
+- `.env.example`: variable names only; real values live in Hermes's `.env` on the host
+
+Deeper rationale and deviations from the reference architecture live in `docs/ARCHITECTURE.md`; per-host setup walks through `workspace-docs/BOOTSTRAP.md`.
 
 ## License
 

@@ -1,0 +1,25 @@
+# Rendered by workflow-intelligence-kit install.sh from
+# deploy/systemd/hermes-gateway-wik.conf.in. Local edits are overwritten on the
+# next install.sh run; change the template or the WIK_* variables instead.
+#
+# Installed as a drop-in for the user unit that `hermes gateway install`
+# generates (hermes-gateway.service). Hermes owns that unit and regenerates it on
+# `hermes update`; a drop-in survives regeneration, a replaced unit would not.
+# https://hermes-agent.nousresearch.com/docs/user-guide/messaging/#service-management
+#
+# Do not add ExecStopPost= here: the Hermes docs warn it causes a restart loop.
+#
+# Service user: @WIK_USER@
+
+[Service]
+# Agent turns run shell commands as this service. Nothing in the read-only
+# design needs privilege escalation, so sudo and setuid binaries are blocked.
+NoNewPrivileges=yes
+
+# Sessions, memories, and logs the gateway creates are private to the service user.
+UMask=0077
+
+# Ceiling for a runaway turn (for example a large document load). Ignored if the
+# memory controller is not delegated to the user manager; systemd restarts the
+# gateway if it is killed.
+MemoryMax=@WIK_GATEWAY_MEMORY_MAX@
