@@ -12,7 +12,7 @@ Each downstream fork inherits the same skeleton: install script, hardening orche
 
 ## Lineage
 
-The pattern, the discipline, and most of the install ergonomics come from RShuken/flyn-agent and the postmortem Ryan published after his first month running it. flyn-agent was the load-bearing reference during design; the gotchas it surfaced — install ordering, secrets layering, the real cost of MCP-to-agent-turn scaffolding on the framework versions we care about — shaped what this kit does and does not include. The framework target is Hermes Agent, NousResearch's MIT-licensed successor to OpenClaw.
+The pattern, the discipline, and most of the install ergonomics come from RShuken/flyn-agent and the postmortem Ryan published after his first month running it. flyn-agent was the load-bearing reference during design; the gotchas it surfaced (install ordering, secrets layering, the real cost of MCP-to-agent-turn scaffolding on the framework versions we care about) shaped what this kit does and does not include. The framework target is Hermes Agent, NousResearch's MIT-licensed successor to OpenClaw.
 
 ## Design shape
 
@@ -59,6 +59,7 @@ Explicitly out:
 - `deploy/hardening/`: `harden.sh` and the four scripts it runs, each usable on its own
 - `deploy/systemd/`: the one template, a drop-in for the unit `hermes gateway install` generates
 - `deploy/skills/workflow-intelligence-reference/weather/`: reference skill
+- `deploy/skills/workflow-intelligence-examples/estimate-followup/`: first real workflow skill, drafts estimate follow-ups for operator approval (demo in `docs/demo/estimate-followup.md`)
 - `deploy/lib/`: helpers shared by the scripts above
 - `workspace/`: `SOUL.md` and `AGENTS.md`, deployed to `~/.hermes/`
 - `workspace-docs/`: `BOOTSTRAP.md`, `HEARTBEAT.md`, `USER.md`, never deployed

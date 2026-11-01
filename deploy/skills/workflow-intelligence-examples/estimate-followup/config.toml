@@ -1,0 +1,93 @@
+# estimate-followup configuration.
+#
+# Everything a fork tunes lives here: where estimates come from, when a
+# follow-up is due, and how the business sounds. The code has no business
+# names, thresholds, or wording in it.
+#
+# Change this file in the fork and re-run install.sh. Editing the deployed copy
+# on the host works, but install.sh will then keep your copy and warn on every
+# run (see docs/ARCHITECTURE.md, managed-file policy).
+#
+# The values below describe a made-up roofing company. Every name, address,
+# phone number, and email in this skill is fake.
+
+[source]
+# A fixture path (relative to this skill directory) or an https base URL that
+# serves the two-call shape:
+#   GET {base_url}/estimates?status=open  -> {"results": [{"id": "..."}], "next": null}
+#   GET {base_url}/estimates/{id}         -> one estimate record (404 if gone)
+# A fork pointing at a real CRM sets an https URL here (or an adapter in front
+# of the CRM that serves this shape) and a read-only token in .env.
+base_url = "fixtures/estimates.json"
+# Name of the .env variable holding a read-only API token, sent as
+# "Authorization: Bearer <token>". Unused by the fixture. The value never
+# appears in config, output, or logs.
+token_env = "ESTIMATES_API_TOKEN"
+# Fixture only: shift the fixture's dates so its as_of date lands on today, so
+# the shipped example produces drafts on any date. Ignored for http sources.
+fixture_shift_dates = true
+timeout_seconds = 15
+
+[selection]
+# The N-day threshold: draft a follow-up once this many calendar days have
+# passed since the estimate was sent or since the last follow-up, whichever is
+# later, with no customer reply.
+followup_after_days = 3
+# Stop after this many follow-ups per estimate. The last one uses
+# [voice] final_sentence.
+max_followups = 2
+# After a draft goes to the operator, wait this many days before drafting the
+# same estimate again (covers drafts the operator has not sent yet).
+redraft_after_days = 3
+# Cap per run, oldest first; the rest wait for the next run. With the voice
+# below a draft is about 500 characters, so 6 fit in one Telegram message
+# (4096 limit). Hermes splits longer output into several messages.
+max_drafts_per_run = 6
+# Which contact to draft for, in order. "email" or "sms".
+channel_preference = ["email", "sms"]
+
+[business]
+name = "Example Ridge Roofing"
+sender_name = "Jordan"
+phone = "555-0142"
+# IANA zone. "N days" is counted in calendar days here.
+timezone = "America/Denver"
+currency_symbol = "$"
+
+[voice]
+# Templates use {placeholders}. Allowed: greeting, first_name, customer_name,
+# job_title, job_address, amount, sent_on, days_waiting, expires_on,
+# expiry_sentence, final_sentence, business_name, sender_name, business_phone.
+# An unknown placeholder fails the run with a config error, before any drafts.
+greeting = "Hi {first_name},"
+greeting_fallback = "Hi there,"
+job_fallback = "roofing"
+
+email_subject = "Checking in on your {job_title} estimate"
+email_body = """
+{greeting}
+
+Just checking in on the {job_title} estimate I sent over on {sent_on}. Happy to walk through any line of it, adjust the scope, or get you on the schedule. {expiry_sentence}
+
+{final_sentence}
+
+Thanks,
+{sender_name}
+{business_name} | {business_phone}
+"""
+
+sms_body = "{greeting} it's {sender_name} with {business_name}. Checking in on the {job_title} estimate from {sent_on}. Any questions, or want to get on the schedule? {expiry_sentence} {final_sentence}"
+
+# Rendered only when the estimate has an expiry date.
+expiry_sentence = "Pricing holds through {expires_on}."
+# Rendered only on the last follow-up (follow-up number == max_followups).
+final_sentence = "I won't keep pestering you about it. If the timing isn't right, just say so and I'll close it out."
+
+# Guidance for the agent when the operator asks it to edit a draft in chat.
+# The script does not use this; SKILL.md tells the agent to read it.
+style_notes = """
+Plain, friendly, local. Short sentences, first person, no exclamation marks.
+Never offer discounts, dates, or warranty terms the operator did not state.
+No pressure or urgency language beyond the real expiry date.
+Keep the sign-off exactly as configured.
+"""
