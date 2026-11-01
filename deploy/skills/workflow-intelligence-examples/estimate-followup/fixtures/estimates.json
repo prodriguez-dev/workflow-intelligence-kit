@@ -1,0 +1,328 @@
+{
+  "_about": "Fake estimates for the estimate-followup example skill. Every name, address, phone (555-01xx), and email (example.com / example.net) is made up. Dates are relative to as_of; with [source] fixture_shift_dates the skill moves them so as_of lands on today.",
+  "as_of": "2026-11-02",
+  "estimates": [
+    {
+      "id": "EST-2041",
+      "status": "open",
+      "customer": {
+        "first_name": "Pat",
+        "last_name": "Placeholder",
+        "email": "pat.placeholder@example.com",
+        "phone": "555-0101",
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "roof replacement",
+        "summary": "Tear-off and replace, 28 squares, architectural shingle, new ice and water shield",
+        "address": "101 Placeholder Ln, Sampleton"
+      },
+      "amount": 14850,
+      "currency": "USD",
+      "sent_at": "2026-10-27T10:14:00-06:00",
+      "expires_on": "2026-11-26",
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2042",
+      "status": "open",
+      "customer": {
+        "first_name": "Sam",
+        "last_name": "Sample",
+        "email": null,
+        "phone": "555-0102",
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "gutter replacement",
+        "summary": "140 ft seamless 6 in aluminum gutters and downspouts",
+        "address": "22 Sample St, Sampleton"
+      },
+      "amount": 2340,
+      "currency": "USD",
+      "sent_at": "2026-10-30T23:30:00-06:00",
+      "expires_on": "2026-11-29",
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2043",
+      "status": "open",
+      "customer": {
+        "first_name": "Dana",
+        "last_name": "Demo",
+        "email": "dana.demo@example.net",
+        "phone": "555-0103",
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "storm damage repair",
+        "summary": "Replace hail-damaged shingles on south slope, two vent boots",
+        "address": "7 Demo Ct, Fakeville"
+      },
+      "amount": 6120.5,
+      "currency": "USD",
+      "sent_at": "2026-10-19T09:05:00-06:00",
+      "expires_on": "2026-11-05",
+      "last_customer_reply_at": null,
+      "follow_up_count": 1,
+      "last_follow_up_at": "2026-10-28T08:30:00-06:00"
+    },
+    {
+      "id": "EST-2044",
+      "status": "open",
+      "customer": {
+        "first_name": "Terry",
+        "last_name": "Testcase",
+        "email": "terry.testcase@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "chimney flashing",
+        "summary": "Remove and reflash chimney, counterflashing cut into mortar",
+        "address": "9 Testcase Way, Sampleton"
+      },
+      "amount": 1875,
+      "currency": "USD",
+      "sent_at": "2026-10-26T14:00:00-06:00",
+      "expires_on": "2026-11-25",
+      "last_customer_reply_at": "2026-10-28T19:02:00-06:00",
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2045",
+      "status": "open",
+      "customer": {
+        "first_name": "Fiona",
+        "last_name": "Fixture",
+        "email": "fiona.fixture@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "roof replacement",
+        "summary": "Tear-off and replace, 22 squares, 3-tab to architectural",
+        "address": "31 Fixture Rd, Fakeville"
+      },
+      "amount": 11200,
+      "currency": "USD",
+      "sent_at": "2026-09-24T11:30:00-06:00",
+      "expires_on": "2026-10-24",
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2046",
+      "status": "open",
+      "customer": {
+        "first_name": "Morgan",
+        "last_name": "Mockup",
+        "email": "",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "flat roof coating",
+        "summary": "Silicone coating over 1,200 sq ft garage roof",
+        "address": "64 Mockup Ave, Sampleton"
+      },
+      "amount": 4400,
+      "currency": "USD",
+      "sent_at": "2026-10-25T10:00:00-06:00",
+      "expires_on": "2026-11-24",
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2047",
+      "status": "open",
+      "customer": {
+        "first_name": "Riley",
+        "last_name": "Redacted",
+        "email": "riley.redacted@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "skylight replacement",
+        "summary": "Replace two fixed skylights with vented units",
+        "address": "5 Redacted Pl, Fakeville"
+      },
+      "amount": 3650,
+      "currency": "USD",
+      "sent_at": "2026-10-31T11:00:00-06:00",
+      "expires_on": "2026-11-30",
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2048",
+      "status": "won",
+      "customer": {
+        "first_name": "Casey",
+        "last_name": "Example",
+        "email": "casey.example@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "roof replacement",
+        "summary": "Tear-off and replace, 30 squares",
+        "address": "88 Example Blvd, Sampleton"
+      },
+      "amount": 16900,
+      "currency": "USD",
+      "sent_at": "2026-10-14T09:00:00-06:00",
+      "expires_on": null,
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2049",
+      "status": "open",
+      "customer": {
+        "first_name": "Jamie",
+        "last_name": "Lorem",
+        "email": "jamie.lorem@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "soffit and fascia",
+        "summary": "Replace 90 ft of rotted fascia, vented soffit",
+        "address": "12 Lorem Ln, Fakeville"
+      },
+      "amount": 2980,
+      "currency": "USD",
+      "sent_at": "2026-10-12T15:45:00-06:00",
+      "expires_on": "2026-11-11",
+      "last_customer_reply_at": null,
+      "follow_up_count": 2,
+      "last_follow_up_at": "2026-10-22T09:10:00-06:00"
+    },
+    {
+      "id": "EST-2050",
+      "status": "open",
+      "customer": {
+        "first_name": "Avery",
+        "last_name": "Ipsum",
+        "email": "avery.ipsum@example.com",
+        "phone": "555-0110",
+        "do_not_contact": true
+      },
+      "job": {
+        "title": "roof inspection report",
+        "summary": "Insurance inspection and written report",
+        "address": "40 Ipsum St, Sampleton"
+      },
+      "amount": 350,
+      "currency": "USD",
+      "sent_at": "2026-10-22T10:30:00-06:00",
+      "expires_on": null,
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2051",
+      "status": "open",
+      "customer": {
+        "first_name": null,
+        "last_name": "Nullington",
+        "email": "nullington.house@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "attic ventilation",
+        "summary": "Ridge vent and four soffit intakes",
+        "address": "3 Nullington Row, Fakeville"
+      },
+      "amount": 3980,
+      "currency": "USD",
+      "sent_at": "2026-10-28T13:20:00-06:00",
+      "expires_on": null,
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2052",
+      "status": "lost",
+      "customer": {
+        "first_name": "Lou",
+        "last_name": "Lost",
+        "email": "lou.lost@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "metal roof",
+        "summary": "Standing seam over 18 squares",
+        "address": "77 Lost Trl, Sampleton"
+      },
+      "amount": 31500,
+      "currency": "USD",
+      "sent_at": "2026-10-05T10:00:00-06:00",
+      "expires_on": null,
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2053",
+      "status": "open",
+      "customer": {
+        "first_name": "Robin",
+        "last_name": "Roundtrip",
+        "email": "robin.roundtrip@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "skylight reflash",
+        "summary": "Reflash and reseal one skylight, replace step flashing",
+        "address": "19 Roundtrip Dr, Sampleton"
+      },
+      "amount": 890,
+      "currency": "USD",
+      "sent_at": "2026-10-29T15:00:00-06:00",
+      "expires_on": "2026-11-28",
+      "last_customer_reply_at": "2026-10-09T08:12:00-06:00",
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    },
+    {
+      "id": "EST-2054",
+      "status": "open",
+      "customer": {
+        "first_name": "Drew",
+        "last_name": "Dataless",
+        "email": "drew.dataless@example.com",
+        "phone": null,
+        "do_not_contact": false
+      },
+      "job": {
+        "title": "gutter guards",
+        "summary": "Micro-mesh guards on 120 ft of gutter",
+        "address": "50 Dataless Ave, Fakeville"
+      },
+      "amount": 1450,
+      "currency": "USD",
+      "sent_at": "",
+      "expires_on": null,
+      "last_customer_reply_at": null,
+      "follow_up_count": 0,
+      "last_follow_up_at": null
+    }
+  ]
+}

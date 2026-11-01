@@ -19,6 +19,8 @@ Each script also cites the specific page it depends on.
 | `/home/hermes/.local/bin/hermes` | hermes | Hermes installer | CLI wrapper |
 | `/home/hermes/.hermes/{SOUL,AGENTS}.md` | hermes | install.sh | Workspace seeds |
 | `/home/hermes/.hermes/skills/workflow-intelligence-reference/` | hermes | install.sh | Reference skill |
+| `/home/hermes/.hermes/skills/workflow-intelligence-examples/` | hermes | install.sh | Example workflow skills |
+| `/home/hermes/.hermes/estimate-followup/surfaced.json` | hermes | estimate-followup (`--record`) | Which estimates were already put in front of the operator |
 | `/home/hermes/.hermes/.wik-managed` | hermes | install.sh | Checksums of kit-deployed files |
 | `/home/hermes/.config/systemd/user/hermes-gateway.service.d/workflow-intelligence.conf` | hermes | install.sh | Gateway drop-in |
 | `/etc/ssh/sshd_config.d/10-wik-hardening.conf` | root | ssh-hardening.sh | Key-only SSH |
@@ -200,7 +202,11 @@ Layers, from strongest to weakest:
    secrets never printed, no escalation.
 
 Email drafts-only is a policy in v1: the kit ships no email integration. A fork
-that adds one should enforce it at the credential (drafts scope only) as well.
+that adds one should also enforce it at the credential where the provider
+allows it. Microsoft Graph does: creating a draft needs `Mail.ReadWrite`, and
+sending needs `Mail.Send`. Gmail does not: its compose scope covers drafts and
+sending together. On Gmail, put an adapter in front that holds the real
+credential as a different user and exposes only create-draft.
 
 ## Hardening
 
@@ -252,8 +258,118 @@ The pattern forks copy:
 The SKILL.md runs its script through `${HERMES_SKILL_DIR}`, which Hermes
 substitutes with the skill's absolute path when the skill loads.
 
+## Example workflow: estimate follow-up
+
+`deploy/skills/workflow-intelligence-examples/estimate-followup/` is the first
+skill that does real work on top of the scaffolding. Scenario: a roofing or
+home-services business sends estimates and loses jobs because nobody follows
+up. A pulse runs the skill each morning; it reads open estimates, picks the
+ones with no reply after `followup_after_days`, drafts a short follow-up for
+each in the business's voice, and delivers the drafts to the operator on
+Telegram. The operator edits by replying and sends the ones they approve from
+their own inbox or phone. A full run, generated from the code, is in
+`docs/demo/estimate-followup.md`. Hermes behavior cited in this section was
+checked against the docs source in the NousResearch/hermes-agent repository
+(`website/docs/`, main branch, November 2026).
+
+**Same two-call shape as the weather skill.** Call 1 lists open estimate IDs
+(`GET /estimates?status=open`, with `next` paging); call 2 reads each by ID
+(`GET /estimates/{id}`). The shipped source is a JSON fixture of fake estimates
+read through the same two calls, plus `scripts/fixture_server.py`, which serves
+it over HTTP so the real client can be tested. A fork points
+`[source] base_url` at an https endpoint with that shape: the CRM's own API if
+it fits, or a thin adapter that maps the CRM's list and read endpoints onto it.
+The HTTP client sends only GET, refuses plain http to anything but loopback,
+and reads its token from the `.env` variable named in `[source] token_env`. A
+fork using a token also uncomments `required_environment_variables` in the
+SKILL.md, which is what makes Hermes pass the variable through to the
+script's terminal and lets cron preflight block the job when it is missing
+([Creating skills: environment variables](https://hermes-agent.nousresearch.com/docs/developer-guide/creating-skills)).
+Per-estimate reads are N+1 calls; a fork whose CRM has a batch read can use
+it behind the same `get_estimate` seam.
+
+**Config, not code.** The threshold, follow-up limit, redraft window, daily
+cap, channel order, business details, time zone, and every word of the drafts
+live in `config.toml`. Templates are validated at load: an unknown
+`{placeholder}` fails the run with exit 2 before anything is drafted, rather
+than shipping a draft with a hole in it.
+
+**The script writes the drafts, not the model.** Scheduled drafts are rendered
+from the `[voice]` templates, and the pulse prompt tells the agent to deliver
+the script's output verbatim. That keeps what the operator approves identical
+to what the tested code produced, makes the demo reproducible, and keeps the
+pulse cheap. The model's part is the conversation after delivery: rewriting a
+draft when the operator asks, under the rules in the SKILL.md. Replies only
+reach the agent with the drafts in context when cron deliveries are
+continuable (`cron.mirror_delivery: true`, off by default;
+[Continuable jobs](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron#continuable-jobs-reply-to-a-cron-delivery)).
+
+**A local ledger instead of writing to the CRM.** The source is read-only, so
+the skill cannot mark an estimate as drafted there. Without memory, the same
+drafts would arrive every morning until the operator sent one and the CRM
+logged it. The ledger (`~/.hermes/estimate-followup/surfaced.json`, mode 600)
+records the date each estimate was surfaced and holds it back for
+`redraft_after_days`; after that it comes back, marked as drafted before. Only
+the pulse writes it (`--record`); a preview in chat never does. When there is
+nothing new, the script prints `[SILENT]` and Hermes delivers nothing.
+
+**Fixture dates float.** The fixture declares an `as_of` date, and with
+`fixture_shift_dates` the source moves every date so `as_of` lands on today.
+Without that, the shipped example would report everything expired a month
+after the fixture was written and look broken on a fresh host.
+
+**install.sh deploys the skill but does not create its pulse.** An example
+that delivers fake estimates to every new host's operator is noise. Forks that
+adopt it create the job with the command in `workspace-docs/HEARTBEAT.md`.
+
+Tests are stdlib `unittest`, no dependencies, and include a check that the demo
+doc matches a fresh run:
+
+```bash
+python3 -m unittest discover \
+  -s deploy/skills/workflow-intelligence-examples/estimate-followup/tests \
+  -t deploy/skills/workflow-intelligence-examples/estimate-followup/tests
+```
+
+`tests/` and `__pycache__/` under `deploy/skills/` are never deployed.
+
+### Why approval-gated drafts instead of auto-send
+
+The skill could send follow-ups itself. It does not, for these reasons:
+
+1. **The credential is the only control that holds.** Sending needs a send
+   scope on the mailbox or SMS account, and that scope sends anything to
+   anyone, not just this follow-up. Drafts-only means the skill requests one
+   read scope on estimates and nothing else, which matches the read-only
+   posture above and the README's drafts-only email policy.
+2. **"No reply" is the CRM's opinion.** Customers answer by calling the
+   office, texting the owner's cell, or saying yes on the roof. The CRM often
+   never hears about it. An automatic nudge to someone who already signed, or
+   who complained yesterday, costs more than the follow-up earns. The operator
+   knows things the record does not.
+3. **A follow-up is a client commitment.** "Pricing holds through Nov 26"
+   is a promise. SOUL.md treats client commitments as draft-plus-checklist
+   work, and v1 has no customer-facing surface. Auto-send would quietly make
+   the assistant customer-facing.
+4. **Retries are harmless for drafts and harmful for sends.** A scheduled run
+   can be caught up after downtime or re-run by hand, and the ledger is local
+   and best effort. A repeated draft is a line of noise in Telegram; a
+   repeated send is a customer getting the same email twice.
+5. **Approval is cheap where the value is.** The slow part is noticing who to
+   chase and writing the note. The skill does both. Approving and sending is
+   a copy and a tap.
+
+A fork that wants auto-send makes that call in its own scope document, and
+should add, at minimum: a send-only scope limited to the follow-up channel,
+reply detection from the mailbox itself rather than the CRM, an idempotency
+key per estimate and follow-up number stored in the system of record, a daily
+send cap, and a period of drafts-only operation to measure how often the
+operator edits or discards drafts before trusting the template unattended.
+
 ## Known gaps
 
 - TODO: installer checksum verification (see Install model).
 - `MemoryMax` is best effort; see systemd above.
 - The kit does not move sshd off port 22 (see Hardening).
+- estimate-followup has only been run against its fixture and the fixture
+  server, not a real CRM or a live Hermes gateway.

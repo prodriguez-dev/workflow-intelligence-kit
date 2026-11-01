@@ -18,6 +18,39 @@ prompt inside one conversation. Pulses are standalone jobs.
 It exists to prove the full path (scheduler, skill, model, Telegram delivery)
 on a new host. Forks usually replace it.
 
+## Example pulse: estimate follow-up
+
+The `estimate-followup` example skill is deployed by install.sh, but its pulse
+is not created: an example that sends fake estimates to every new operator is
+noise. A fork that adopts the skill creates it:
+
+```bash
+# Optional but recommended: lets the operator reply to the delivery ("edit 2: ...")
+# with the drafts in the agent's context. Off by default; applies to every job
+# that delivers to a home channel. Restart the gateway after changing it.
+hermes config set cron.mirror_delivery true
+
+hermes cron create "40 7 * * 1-6" \
+  "Run today's estimate follow-up check with the estimate-followup skill in scheduled mode (--record). Reply with the script's output exactly as printed and nothing else." \
+  --name wik-example-estimate-followup --skill estimate-followup \
+  --deliver telegram --workdir ~/.hermes \
+  --paused --paused-reason "Review the first run before resuming"
+
+hermes cron run wik-example-estimate-followup     # one run on the next tick
+hermes cron resume wik-example-estimate-followup  # once the output looks right
+```
+
+07:40 Monday to Saturday, in `HERMES_TIMEZONE`. The threshold, voice, and
+everything else it uses are in the skill's `config.toml`; change them in the
+fork and re-run install.sh. When nothing is due, the run replies `[SILENT]`
+and nothing is delivered. A test run with `hermes cron run` records what it
+surfaced, so those estimates are held back for `redraft_after_days`; delete
+`~/.hermes/estimate-followup/surfaced.json` to reset.
+
+The pulse never sends to customers. It delivers drafts to the operator, who
+sends the approved ones themselves. See `docs/ARCHITECTURE.md`, "Why
+approval-gated drafts instead of auto-send".
+
 ## Everyday commands
 
 Run as the service user (`sudo -iu hermes`):

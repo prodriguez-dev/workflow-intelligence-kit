@@ -96,8 +96,9 @@ log "step 1: base packages"
 # prerequisites. libatomic1 is needed by Hermes's managed Node.js; the installer
 # would try `sudo -n` for it, which the unprivileged service user cannot do.
 # https://hermes-agent.nousresearch.com/docs/getting-started/installation#prerequisites
-# python3 is used here to read cron/jobs.json and by the weather skill script.
-ensure_packages ca-certificates curl git tar coreutils libatomic1 python3
+# python3 is used here to read cron/jobs.json and by the skill scripts. tzdata
+# backs Python's zoneinfo, which estimate-followup uses for its business time zone.
+ensure_packages ca-certificates curl git tar coreutils libatomic1 python3 tzdata
 
 # --- 2. Hardening ------------------------------------------------------------
 
@@ -225,6 +226,8 @@ deploy_managed "$KIT_DIR/workspace/AGENTS.md" AGENTS.md 0644
 
 # Skills live under ~/.hermes/skills/<category>/<skill>/.
 # https://hermes-agent.nousresearch.com/docs/user-guide/features/skills#skill-directory-structure
+# Skill tests and Python bytecode stay in the checkout; the host gets only what
+# the agent runs.
 skill_src="$KIT_DIR/deploy/skills"
 while IFS= read -r -d '' file; do
   rel="skills/${file#"$skill_src"/}"
@@ -233,7 +236,7 @@ while IFS= read -r -d '' file; do
     *) mode=0644 ;;
   esac
   deploy_managed "$file" "$rel" "$mode"
-done < <(find "$skill_src" -type f -print0 | sort -z)
+done < <(find "$skill_src" \( -name tests -o -name __pycache__ \) -prune -o -type f ! -name '*.pyc' -print0 | sort -z)
 
 state_content="$WIK_TMPDIR/wik-managed"
 for path in "${!managed_sha[@]}"; do

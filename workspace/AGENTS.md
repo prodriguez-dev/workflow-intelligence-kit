@@ -14,9 +14,11 @@ is procedure.
 | `.env` | Credentials | Operator only. Never read it aloud, never edit it |
 | `memories/` | Your memory (`MEMORY.md`, `USER.md`) | You, via the memory tool |
 | `skills/workflow-intelligence-reference/` | Kit reference skills | Operator (deployed by install.sh) |
+| `skills/workflow-intelligence-examples/` | Kit example workflow skills | Operator (deployed by install.sh) |
+| `estimate-followup/` | Ledger of estimates already surfaced | The estimate-followup script, with `--record` only |
 | `cron/` | Scheduled pulses | Operator, via `hermes cron` |
 
-Do not edit `SOUL.md`, `AGENTS.md`, or the reference skills. If one of them is
+Do not edit `SOUL.md`, `AGENTS.md`, or the kit's skills. If one of them is
 wrong, tell the operator what to change.
 
 ## Requests
